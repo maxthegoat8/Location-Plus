@@ -45,12 +45,12 @@ const LocationSafety = () => {
     setIsCountdownActive(true);
   }, []);
 
-  const openSafetyCheckModal = useCallback(() => {
+  const openTimerCompleteModal = useCallback(() => {
     // Stop the countdown
     setIsCountdownActive(false);
     
-    // Open the safety check modal
-    setIsSafetyCheckModalOpen(true);
+    // Open the timer complete modal
+    setIsTimerCompleteModalOpen(true);
   }, []);
 
   const cancelScheduledCheckIn = useCallback(() => {
@@ -58,8 +58,8 @@ const LocationSafety = () => {
     setScheduledCheckInTime(null);
   }, []);
 
-  const closeSafetyCheckModal = useCallback(() => {
-    setIsSafetyCheckModalOpen(false);
+  const closeTimerCompleteModal = useCallback(() => {
+    setIsTimerCompleteModalOpen(false);
   }, []);
 
   const openContactSelectionModal = useCallback(() => {
@@ -220,7 +220,7 @@ const LocationSafety = () => {
             <InlineCheckInTimer 
               scheduledTime={scheduledCheckInTime}
               message={checkInMessage}
-              onComplete={openSafetyCheckModal}
+              onComplete={openTimerCompleteModal}
               onCancel={cancelScheduledCheckIn}
             />
           ) : (
@@ -253,8 +253,8 @@ const LocationSafety = () => {
       
       {/* Timer is now displayed inline, not as a modal */}
       
-      {isSafetyCheckModalOpen && (
-        <SafetyCheckModal onClose={closeSafetyCheckModal} />
+      {isTimerCompleteModalOpen && (
+        <TimerCompleteModal onClose={closeTimerCompleteModal} />
       )}
 
       {isContactSelectionModalOpen && (
