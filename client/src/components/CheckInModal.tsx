@@ -4,11 +4,11 @@ import TimePicker from "./TimePicker";
 
 interface CheckInModalProps {
   onClose: () => void;
-  onSetCheckIn: () => void;
+  onSetCheckIn: (scheduledTime: Date, message: string) => void;
 }
 
 const CheckInModal: React.FC<CheckInModalProps> = ({ onClose, onSetCheckIn }) => {
-  const [scheduledHour, setScheduledHour] = useState<number>(new Date().getHours() + 1);
+  const [scheduledHour, setScheduledHour] = useState<number>(new Date().getHours());
   const [scheduledMinute, setScheduledMinute] = useState<number>(0);
   const [message, setMessage] = useState<string>("I'll let you know when I arrive...");
   const { selectedContacts } = useSafety();
@@ -19,8 +19,26 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ onClose, onSetCheckIn }) =>
   };
 
   const handleSetCheckIn = () => {
-    // Here you would save the check-in details
-    onSetCheckIn();
+    // Create a Date object for the scheduled time
+    const now = new Date();
+    const scheduledTime = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      scheduledHour,
+      scheduledMinute
+    );
+    
+    // If the scheduled time is in the past (earlier today), set it for tomorrow
+    if (scheduledTime < now) {
+      scheduledTime.setDate(scheduledTime.getDate() + 1);
+    }
+    
+    // For demo purposes, set the time to 30 seconds from now
+    const demoTime = new Date(Date.now() + 30 * 1000);
+    
+    // Pass the scheduled time and message to the parent component
+    onSetCheckIn(demoTime, message);
   };
 
   return (

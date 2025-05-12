@@ -1,17 +1,30 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useLocation, useRoute } from "wouter";
 import StatusBar from "@/components/StatusBar";
 import ChatBubble from "@/components/ChatBubble";
 import { chats, findChatById, findMessagesForChat } from "@/lib/data";
+import { getEmergencyMessagesForChat } from "@/lib/emergencyService";
 
 const ChatDetail = () => {
   const [_, setLocation] = useLocation();
   const [matched, params] = useRoute('/chat/:id');
   const [messageText, setMessageText] = useState("");
+  const [allMessages, setAllMessages] = useState<any[]>([]); // Combined messages
   
   const chatId = params?.id || "";
   const chat = findChatById(chatId);
-  const messages = findMessagesForChat(chatId);
+  const regularMessages = findMessagesForChat(chatId);
+  const emergencyMessages = getEmergencyMessagesForChat(chatId);
+
+  // Combine regular and emergency messages
+  useEffect(() => {
+    if (chat) {
+      const combined = [...regularMessages, ...emergencyMessages].sort(
+        (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
+      );
+      setAllMessages(combined);
+    }
+  }, [chat, regularMessages, emergencyMessages]);
 
   const navigateToChats = useCallback(() => {
     setLocation("/chats");
@@ -22,13 +35,27 @@ const ChatDetail = () => {
     return null;
   }
 
+  // Format online status based on chat type
+  const getStatusText = () => {
+    if (chat.isGroup) {
+      return "group chat";
+    } else if (chat.isOnline) {
+      return "online";
+    } else {
+      return "last seen today";
+    }
+  };
+
+  // Check if this is an emergency contact/chat
+  const isEmergencyChat = emergencyMessages.length > 0;
+
   return (
     <div className="phone-container wa-bg-dark text-white rounded-3xl overflow-hidden shadow-2xl relative">
       <div className="absolute inset-0 flex flex-col h-full">
         <StatusBar />
         
         {/* Chat Header */}
-        <div className="wa-bg-bubble-in p-2 flex items-center">
+        <div className={`p-2 flex items-center ${isEmergencyChat ? 'bg-red-800' : 'wa-bg-bubble-in'}`}>
           <button 
             onClick={navigateToChats} 
             className="mr-2"
@@ -52,7 +79,7 @@ const ChatDetail = () => {
             )}
             <div>
               <h2 className="font-semibold">{chat.name}</h2>
-              <p className="text-xs wa-text-secondary">online</p>
+              <p className="text-xs wa-text-secondary">{getStatusText()}</p>
             </div>
           </div>
           <div className="flex space-x-4">
@@ -76,12 +103,20 @@ const ChatDetail = () => {
         
         {/* Chat Messages */}
         <div className="flex-1 bg-[#0B141A] bg-opacity-90 p-3 overflow-y-auto">
+          {/* Emergency Alert Banner */}
+          {isEmergencyChat && (
+            <div className="bg-red-700 text-white p-3 rounded-lg mb-3 text-center">
+              <p className="font-bold">Emergency Help Request Sent</p>
+              <p className="text-sm">Location information has been shared with this contact</p>
+            </div>
+          )}
+
           {/* Date Divider */}
           <div className="flex justify-center my-3">
             <span className="wa-bg-bubble-in text-xs wa-text-secondary px-3 py-1 rounded-lg">TODAY</span>
           </div>
           
-          {messages.map((message) => (
+          {allMessages.map((message) => (
             <ChatBubble 
               key={message.id} 
               message={message} 

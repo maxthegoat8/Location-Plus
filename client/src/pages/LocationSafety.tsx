@@ -4,6 +4,7 @@ import StatusBar from "@/components/StatusBar";
 import SafetyContactCard from "@/components/SafetyContactCard";
 import CheckInModal from "@/components/CheckInModal";
 import SafetyCheckModal from "@/components/SafetyCheckModal";
+import CheckInCountdown from "@/components/CheckInCountdown";
 import ContactSelectionModal from "@/components/ContactSelectionModal";
 import { useSafety } from "@/contexts/SafetyContext";
 import { safetyContacts } from "@/lib/data";
@@ -12,9 +13,12 @@ const LocationSafety = () => {
   const [_, setLocation] = useLocation();
   const [duration, setDuration] = useState(120); // Default 2 hours (in minutes)
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
+  const [isCountdownActive, setIsCountdownActive] = useState(false);
   const [isSafetyCheckModalOpen, setIsSafetyCheckModalOpen] = useState(false);
   const [isContactSelectionModalOpen, setIsContactSelectionModalOpen] = useState(false);
   const [isLocationShared, setIsLocationShared] = useState(true);
+  const [scheduledCheckInTime, setScheduledCheckInTime] = useState<Date | null>(null);
+  const [checkInMessage, setCheckInMessage] = useState("");
   const { selectedContacts, toggleContact } = useSafety();
 
   const navigateToChats = useCallback(() => {
@@ -29,8 +33,29 @@ const LocationSafety = () => {
     setIsCheckInModalOpen(false);
   }, []);
 
+  const handleSetCheckIn = useCallback((scheduledTime: Date, message: string) => {
+    // Close the check-in modal
+    setIsCheckInModalOpen(false);
+    
+    // Set the scheduled time and message
+    setScheduledCheckInTime(scheduledTime);
+    setCheckInMessage(message);
+    
+    // Start the countdown
+    setIsCountdownActive(true);
+  }, []);
+
   const openSafetyCheckModal = useCallback(() => {
+    // Stop the countdown
+    setIsCountdownActive(false);
+    
+    // Open the safety check modal
     setIsSafetyCheckModalOpen(true);
+  }, []);
+
+  const cancelScheduledCheckIn = useCallback(() => {
+    setIsCountdownActive(false);
+    setScheduledCheckInTime(null);
   }, []);
 
   const closeSafetyCheckModal = useCallback(() => {
@@ -211,7 +236,15 @@ const LocationSafety = () => {
       {isCheckInModalOpen && (
         <CheckInModal 
           onClose={closeCheckInModal} 
-          onSetCheckIn={openSafetyCheckModal}
+          onSetCheckIn={handleSetCheckIn}
+        />
+      )}
+      
+      {isCountdownActive && scheduledCheckInTime && (
+        <CheckInCountdown 
+          scheduledTime={scheduledCheckInTime}
+          onComplete={openSafetyCheckModal}
+          onCancel={cancelScheduledCheckIn}
         />
       )}
       
