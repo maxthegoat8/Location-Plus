@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 20 14.3% 4.1%;
+  --muted: 60 4.8% 95.9%;
+  --muted-foreground: 25 5.3% 44.7%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 20 14.3% 4.1%;
+  --card: 0 0% 100%;
+  --card-foreground: 20 14.3% 4.1%;
+  --border: 20 5.9% 90%;
+  --input: 20 5.9% 90%;
+  --primary: 160 84% 39%;
+  --primary-foreground: 211 100% 99%;
+  --secondary: 60 4.8% 95.9%;
+  --secondary-foreground: 24 9.8% 10%;
+  --accent: 60 4.8% 95.9%;
+  --accent-foreground: 24 9.8% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 60 9.1% 97.8%;
+  --ring: 20 14.3% 4.1%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 222 47% 11%;
+  --foreground: 0 0% 98%;
+  --muted: 223 47% 11%;
+  --muted-foreground: 240 5% 64.9%;
+  --popover: 222 47% 11%;
+  --popover-foreground: 0 0% 98%;
+  --card: 222 47% 11%;
+  --card-foreground: 0 0% 98%;
+  --border: 216 34% 17%;
+  --input: 216 34% 17%;
+  --primary: 142 70% 49%;
+  --primary-foreground: 211 100% 99%;
+  --secondary: 222 47% 11%;
+  --secondary-foreground: 0 0% 98%;
+  --accent: 217 33% 17%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 240 4.9% 83.9%;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .wa-chat-bubble-in {
+    @apply bg-[#1F2C34] text-white rounded-lg p-2 max-w-[80%];
+  }
+
+  .wa-chat-bubble-out {
+    @apply bg-[#005C4B] text-white rounded-lg p-2 max-w-[80%];
+  }
+
+  .wa-bg-dark {
+    @apply bg-[#121B22];
+  }
+
+  .wa-bg-chat-darker {
+    @apply bg-[#0B141A];
+  }
+
+  .wa-bg-bubble-in {
+    @apply bg-[#1F2C34];
+  }
+
+  .wa-bg-green {
+    @apply bg-[#128C7E];
+  }
+
+  .wa-green {
+    @apply text-[#25D366];
+  }
+
+  .wa-light-green {
+    @apply bg-[#25D366];
+  }
+
+  .wa-input {
+    @apply bg-[#1F2C34] text-white outline-none rounded-full px-4 py-2;
+  }
+
+  .wa-text-secondary {
+    @apply text-[#8696A0];
+  }
+
+  .wa-status-blue {
+    @apply text-[#34B7F1];
+  }
+
+  .status-dot {
+    @apply absolute bottom-0 right-0 w-3 h-3 bg-[#25D366] rounded-full border-2 border-[#121B22];
+  }
+
+  .phone-container {
+    @apply max-w-sm h-screen max-h-[844px] overflow-hidden relative;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
