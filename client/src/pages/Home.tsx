@@ -1,13 +1,41 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useLocation } from "wouter";
 import StatusBar from "@/components/StatusBar";
+import HomeWidgetModal from "@/components/HomeWidgetModal";
+import EmergencyHelpSent from "@/components/EmergencyHelpSent";
+import { useSafety } from "@/contexts/SafetyContext";
+import { sendEmergencyMessages } from "@/lib/emergencyService";
 
 const Home = () => {
   const [_, setLocation] = useLocation();
+  const [isWidgetModalOpen, setIsWidgetModalOpen] = useState(false);
+  const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState(false);
+  const { selectedContacts } = useSafety();
 
-  const navigateToChats = useCallback(() => {
-    setLocation("/chats");
-  }, [setLocation]);
+  const openWidgetModal = useCallback(() => {
+    setIsWidgetModalOpen(true);
+  }, []);
+
+  const closeWidgetModal = useCallback(() => {
+    setIsWidgetModalOpen(false);
+  }, []);
+
+  const closeEmergencyModal = useCallback(() => {
+    setIsEmergencyModalOpen(false);
+  }, []);
+
+  const handleSendHelp = useCallback(async () => {
+    // Close the widget modal
+    setIsWidgetModalOpen(false);
+    
+    // Send emergency messages to all selected safety contacts
+    const result = await sendEmergencyMessages(selectedContacts);
+    
+    if (result) {
+      // Show the emergency sent confirmation
+      setIsEmergencyModalOpen(true);
+    }
+  }, [selectedContacts]);
 
   return (
     <div className="phone-container wa-bg-dark text-white rounded-3xl overflow-hidden shadow-2xl relative">
@@ -25,7 +53,7 @@ const Home = () => {
           
           {/* WhatsApp Widget */}
           <div 
-            onClick={navigateToChats}
+            onClick={openWidgetModal}
             className="bg-gray-800 bg-opacity-70 p-4 rounded-xl w-full max-w-xs flex items-center space-x-3 text-white cursor-pointer shadow-lg mb-4"
           >
             <div className="wa-light-green rounded-full p-2">
@@ -33,7 +61,7 @@ const Home = () => {
                 <path d="M3 21l1.9-5.7a8.5 8.5 0 113.8 3.8z"></path>
               </svg>
             </div>
-            <span className="text-xl">Location +</span>
+            <span className="text-xl">Check-In at 10:40!</span>
           </div>
           
           {/* Quick Access Icons */}
@@ -54,6 +82,21 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      {isWidgetModalOpen && (
+        <HomeWidgetModal 
+          onClose={closeWidgetModal} 
+          onSendHelp={handleSendHelp} 
+        />
+      )}
+
+      {isEmergencyModalOpen && (
+        <EmergencyHelpSent 
+          contactCount={selectedContacts.length} 
+          onClose={closeEmergencyModal} 
+        />
+      )}
     </div>
   );
 };
