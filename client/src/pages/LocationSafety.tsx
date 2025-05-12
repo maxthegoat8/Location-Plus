@@ -3,8 +3,8 @@ import { useLocation } from "wouter";
 import StatusBar from "@/components/StatusBar";
 import SafetyContactCard from "@/components/SafetyContactCard";
 import CheckInModal from "@/components/CheckInModal";
-import SafetyCheckModal from "@/components/SafetyCheckModal";
-import CheckInCountdown from "@/components/CheckInCountdown";
+import TimerCompleteModal from "@/components/TimerCompleteModal";
+import InlineCheckInTimer from "@/components/InlineCheckInTimer";
 import ContactSelectionModal from "@/components/ContactSelectionModal";
 import { useSafety } from "@/contexts/SafetyContext";
 import { safetyContacts } from "@/lib/data";
@@ -14,7 +14,7 @@ const LocationSafety = () => {
   const [duration, setDuration] = useState(120); // Default 2 hours (in minutes)
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
-  const [isSafetyCheckModalOpen, setIsSafetyCheckModalOpen] = useState(false);
+  const [isTimerCompleteModalOpen, setIsTimerCompleteModalOpen] = useState(false);
   const [isContactSelectionModalOpen, setIsContactSelectionModalOpen] = useState(false);
   const [isLocationShared, setIsLocationShared] = useState(true);
   const [scheduledCheckInTime, setScheduledCheckInTime] = useState<Date | null>(null);
@@ -157,25 +157,27 @@ const LocationSafety = () => {
             </label>
           </div>
           
-          {/* Location Duration Slider */}
-          <div className="mb-6">
-            <h3 className="font-semibold mb-2">Duration for location sharing</h3>
-            <input 
-              type="range" 
-              min="15" 
-              max="480" 
-              step="15" 
-              value={duration}
-              onChange={(e) => setDuration(parseInt(e.target.value))}
-              className="w-full h-2 wa-bg-bubble-in rounded-lg appearance-none cursor-pointer" 
-            />
-            <div className="flex justify-between text-xs wa-text-secondary mt-1">
-              <span>15min</span>
-              <span>2h</span>
-              <span>4h</span>
-              <span>8h</span>
+          {/* Location Duration Slider - Only shown when location sharing is enabled */}
+          {isLocationShared && (
+            <div className="mb-6">
+              <h3 className="font-semibold mb-2">Duration for location sharing</h3>
+              <input 
+                type="range" 
+                min="15" 
+                max="480" 
+                step="15" 
+                value={duration}
+                onChange={(e) => setDuration(parseInt(e.target.value))}
+                className="w-full h-2 wa-bg-bubble-in rounded-lg appearance-none cursor-pointer" 
+              />
+              <div className="flex justify-between text-xs wa-text-secondary mt-1">
+                <span>15min</span>
+                <span>2h</span>
+                <span>4h</span>
+                <span>8h</span>
+              </div>
             </div>
-          </div>
+          )}
           
           {/* Location Map */}
           <div className="mb-6 rounded-xl overflow-hidden relative">
@@ -213,22 +215,31 @@ const LocationSafety = () => {
             </svg>
           </div>
           
-          {/* Safety Check Button */}
-          <div className="wa-bg-bubble-in p-4 rounded-xl mb-4">
-            <div className="flex items-center mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#25D366] mr-2">
-                <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"></path>
-                <path d="M12 3v6"></path>
-              </svg>
-              <h3 className="font-semibold">Send safety check</h3>
+          {/* Safety Check Section */}
+          {isCountdownActive && scheduledCheckInTime ? (
+            <InlineCheckInTimer 
+              scheduledTime={scheduledCheckInTime}
+              message={checkInMessage}
+              onComplete={openSafetyCheckModal}
+              onCancel={cancelScheduledCheckIn}
+            />
+          ) : (
+            <div className="wa-bg-bubble-in p-4 rounded-xl mb-4">
+              <div className="flex items-center mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#25D366] mr-2">
+                  <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"></path>
+                  <path d="M12 3v6"></path>
+                </svg>
+                <h3 className="font-semibold">Send safety check</h3>
+              </div>
+              <button 
+                onClick={openCheckInModal}
+                className="wa-light-green text-white w-full py-2 rounded-lg font-semibold"
+              >
+                Schedule Check-In
+              </button>
             </div>
-            <button 
-              onClick={openCheckInModal}
-              className="wa-light-green text-white w-full py-2 rounded-lg font-semibold"
-            >
-              Schedule Check-In
-            </button>
-          </div>
+          )}
         </div>
       </div>
 
@@ -240,13 +251,7 @@ const LocationSafety = () => {
         />
       )}
       
-      {isCountdownActive && scheduledCheckInTime && (
-        <CheckInCountdown 
-          scheduledTime={scheduledCheckInTime}
-          onComplete={openSafetyCheckModal}
-          onCancel={cancelScheduledCheckIn}
-        />
-      )}
+      {/* Timer is now displayed inline, not as a modal */}
       
       {isSafetyCheckModalOpen && (
         <SafetyCheckModal onClose={closeSafetyCheckModal} />

@@ -19,12 +19,12 @@ const ChatDetail = () => {
   // Combine regular and emergency messages
   useEffect(() => {
     if (chat) {
-      const combined = [...regularMessages, ...emergencyMessages].sort(
+      const combinedMessages = [...regularMessages, ...emergencyMessages].sort(
         (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
       );
-      setAllMessages(combined);
+      setAllMessages(combinedMessages);
     }
-  }, [chat, regularMessages, emergencyMessages]);
+  }, [chat, regularMessages.length, emergencyMessages.length]);
 
   const navigateToChats = useCallback(() => {
     setLocation("/chats");
