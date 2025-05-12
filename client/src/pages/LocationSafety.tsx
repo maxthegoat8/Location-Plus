@@ -4,6 +4,7 @@ import StatusBar from "@/components/StatusBar";
 import SafetyContactCard from "@/components/SafetyContactCard";
 import CheckInModal from "@/components/CheckInModal";
 import SafetyCheckModal from "@/components/SafetyCheckModal";
+import ContactSelectionModal from "@/components/ContactSelectionModal";
 import { useSafety } from "@/contexts/SafetyContext";
 import { safetyContacts } from "@/lib/data";
 
@@ -12,6 +13,7 @@ const LocationSafety = () => {
   const [duration, setDuration] = useState(120); // Default 2 hours (in minutes)
   const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
   const [isSafetyCheckModalOpen, setIsSafetyCheckModalOpen] = useState(false);
+  const [isContactSelectionModalOpen, setIsContactSelectionModalOpen] = useState(false);
   const [isLocationShared, setIsLocationShared] = useState(true);
   const { selectedContacts, toggleContact } = useSafety();
 
@@ -25,15 +27,30 @@ const LocationSafety = () => {
 
   const closeCheckInModal = useCallback(() => {
     setIsCheckInModalOpen(false);
-    // Simulate a check-in event after a delay
-    setTimeout(() => {
-      setIsSafetyCheckModalOpen(true);
-    }, 1500);
+  }, []);
+
+  const openSafetyCheckModal = useCallback(() => {
+    setIsSafetyCheckModalOpen(true);
   }, []);
 
   const closeSafetyCheckModal = useCallback(() => {
     setIsSafetyCheckModalOpen(false);
   }, []);
+
+  const openContactSelectionModal = useCallback(() => {
+    setIsContactSelectionModalOpen(true);
+  }, []);
+
+  const closeContactSelectionModal = useCallback(() => {
+    setIsContactSelectionModalOpen(false);
+  }, []);
+
+  // This should filter contacts that are not already selected
+  const getAvailableContacts = useCallback(() => {
+    return safetyContacts.filter(
+      contact => !selectedContacts.some(sc => sc.id === contact.id)
+    );
+  }, [selectedContacts]);
 
   const getDurationLabel = useCallback((minutes: number) => {
     if (minutes < 60) {
@@ -84,14 +101,18 @@ const LocationSafety = () => {
         <div className="p-4 wa-bg-dark overflow-y-auto flex-1">
           <h2 className="text-lg font-semibold mb-3">My safety contacts...</h2>
           <div className="flex space-x-4 mb-6 overflow-x-auto">
-            {safetyContacts.map((contact) => (
+            {selectedContacts.map((contact) => (
               <SafetyContactCard
                 key={contact.id}
                 contact={contact}
-                isSelected={selectedContacts.some(sc => sc.id === contact.id)}
+                isSelected={true}
                 onToggle={() => toggleContact(contact)}
               />
             ))}
+            <SafetyContactCard
+              isAddButton={true}
+              onAddClick={openContactSelectionModal}
+            />
           </div>
           
           {/* Live Location Toggle */}
@@ -188,11 +209,22 @@ const LocationSafety = () => {
 
       {/* Modals */}
       {isCheckInModalOpen && (
-        <CheckInModal onClose={closeCheckInModal} />
+        <CheckInModal 
+          onClose={closeCheckInModal} 
+          onSetCheckIn={openSafetyCheckModal}
+        />
       )}
       
       {isSafetyCheckModalOpen && (
         <SafetyCheckModal onClose={closeSafetyCheckModal} />
+      )}
+
+      {isContactSelectionModalOpen && (
+        <ContactSelectionModal
+          availableContacts={getAvailableContacts()}
+          onSelectContact={toggleContact}
+          onClose={closeContactSelectionModal}
+        />
       )}
     </div>
   );
