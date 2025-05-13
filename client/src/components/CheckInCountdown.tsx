@@ -49,8 +49,7 @@ const CheckInCountdown: React.FC<CheckInCountdownProps> = ({
 
   // Calculate percentage for progress circle
   const calculatePercentage = (): number => {
-    // Demo: assuming the timer starts from 30 seconds
-    const totalDuration = 30; // in seconds
+    const totalDuration = Math.floor((scheduledTime.getTime() - Date.now()) / 1000);
     return (timeLeft / totalDuration) * 100;
   };
 

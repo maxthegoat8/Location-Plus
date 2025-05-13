@@ -15,7 +15,7 @@ const HomeWidgetModal: React.FC<HomeWidgetModalProps> = ({ onClose, onSendHelp }
   };
 
   const handleCheckIn = () => {
-    setLocation("/safety");
+    setLocation("/chats");
     onClose();
   };
 
@@ -46,7 +46,7 @@ const HomeWidgetModal: React.FC<HomeWidgetModalProps> = ({ onClose, onSendHelp }
               <path d="M12 8v4l3 3"></path>
               <circle cx="12" cy="12" r="10"></circle>
             </svg>
-            I'm checking in
+            I am safe
           </button>
           
           <button 

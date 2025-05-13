@@ -34,11 +34,8 @@ const CheckInModal: React.FC<CheckInModalProps> = ({ onClose, onSetCheckIn }) =>
       scheduledTime.setDate(scheduledTime.getDate() + 1);
     }
     
-    // For demo purposes, set the time to 30 seconds from now
-    const demoTime = new Date(Date.now() + 30 * 1000);
-    
     // Pass the scheduled time and message to the parent component
-    onSetCheckIn(demoTime, message);
+    onSetCheckIn(scheduledTime, message);
   };
 
   return (
