@@ -142,3 +142,21 @@ export type InsertSafetyCheckIn = z.infer<typeof insertSafetyCheckInSchema>;
 
 export type LocationSharing = typeof locationSharing.$inferSelect;
 export type InsertLocationSharing = z.infer<typeof insertLocationSharingSchema>;
+
+// ----- START: Check‑In and Contacts Schema -----
+export const trusted_contacts = pgTable('trusted_contacts', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id),
+  name: text('name').notNull(),
+  contactInfo: text('contact_info').notNull(), // email or phone
+});
+
+export const check_ins = pgTable('check_ins', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id),
+  scheduledAt: timestamp('scheduled_at').notNull(),
+  message: text('message').notNull(),
+  contacts: integer('contacts').array().notNull(),  // array of trusted_contact IDs
+  sent: boolean('sent').default(false).notNull(),
+});
+// ----- END: Check‑In and Contacts Schema -----
