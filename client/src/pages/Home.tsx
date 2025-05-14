@@ -37,6 +37,14 @@ const Home = () => {
     }
   }, [selectedContacts]);
 
+  const currentTime = new Date().toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+
+  const batteryLevel = "100 % geladen";
+
   return (
     <div className="phone-container wa-bg-dark text-white rounded-3xl overflow-hidden shadow-2xl relative">
       <div className="absolute inset-0 flex flex-col h-full">
@@ -45,10 +53,10 @@ const Home = () => {
         {/* Home Screen Content */}
         <div className="flex-1 p-4 bg-gradient-to-br from-pink-300 via-red-300 to-blue-400 flex flex-col justify-center items-center">
           <div className="mb-4 text-4xl font-semibold text-white text-center">
-            09:41
+            {currentTime}
           </div>
           <div className="text-white text-center mb-6">
-            100 % geladen
+            {batteryLevel}
           </div>
           
           {/* WhatsApp Widget */}
