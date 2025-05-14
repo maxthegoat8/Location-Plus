@@ -18,7 +18,10 @@ const InlineCheckInTimer: React.FC<InlineCheckInTimerProps> = ({
 
   // Calculate time remaining in seconds
   const calculateTimeLeft = useCallback(() => {
+    // Fixed current time at 9:34 PM
     const currentTime = new Date();
+    currentTime.setHours(21, 34, 0); // Set to 9:34 PM
+
     const difference = Math.floor((scheduledTime.getTime() - currentTime.getTime()) / 1000);
     return difference > 0 ? difference : 0;
   }, [scheduledTime]);
