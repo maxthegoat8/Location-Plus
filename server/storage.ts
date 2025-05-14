@@ -255,3 +255,38 @@ export class MemStorage implements IStorage {
 }
 
 export const storage = new MemStorage();
+
+// ----- START: Check‑In Storage Methods -----
+export async function createCheckIn(data: {
+  userId: number;
+  scheduledAt: Date;
+  message: string;
+  contacts: number[];
+}): Promise<CheckIn> {
+  const [record] = await db.insert(check_ins)
+    .values({ ...data })
+    .returning();
+  return record;
+}
+
+export async function getPendingCheckIns(): Promise<CheckIn[]> {
+  return await db
+    .select()
+    .from(check_ins)
+    .where(and(
+      lte(check_ins.scheduledAt, new Date()),
+      eq(check_ins.sent, false)
+    ));
+}
+
+export async function markCheckInSent(id: number): Promise<void> {
+  await db.update(check_ins)
+    .set({ sent: true })
+    .where(eq(check_ins.id, id));
+}
+
+export async function getContactById(id: number) {
+  const [record] = await db.select().from(trusted_contacts).where(eq(trusted_contacts.id, id));
+  return record;
+}
+// ----- END: Check‑In Storage Methods -----
