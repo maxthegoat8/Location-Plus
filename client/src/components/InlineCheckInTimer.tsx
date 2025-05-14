@@ -18,7 +18,11 @@ const InlineCheckInTimer: React.FC<InlineCheckInTimerProps> = ({
 
   // Calculate time remaining in seconds
   const calculateTimeLeft = useCallback(() => {
-    const difference = Math.floor((scheduledTime.getTime() - Date.now()) / 1000);
+    // Fixed current time at 9:34 PM
+    const currentTime = new Date();
+    currentTime.setHours(21, 34, 0); // Set to 9:34 PM
+
+    const difference = Math.floor((scheduledTime.getTime() - currentTime.getTime()) / 1000);
     return difference > 0 ? difference : 0;
   }, [scheduledTime]);
 
@@ -42,11 +46,12 @@ const InlineCheckInTimer: React.FC<InlineCheckInTimerProps> = ({
     return () => clearInterval(timer);
   }, [calculateTimeLeft, isComplete, onComplete]);
 
-  // Format seconds into MM:SS
+  // Format seconds into HH:MM:SS
   const formatTime = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -68,7 +73,9 @@ const InlineCheckInTimer: React.FC<InlineCheckInTimerProps> = ({
       <div className="relative w-full h-2 bg-gray-700 rounded-full mb-3">
         <div 
           className="absolute left-0 top-0 h-full bg-wa-light-green rounded-full"
-          style={{ width: `${(timeLeft / 30) * 100}%` }}
+          style={{ 
+            width: `${(timeLeft / calculateTimeLeft()) * 100}%` 
+          }}
         ></div>
       </div>
       

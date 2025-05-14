@@ -16,7 +16,11 @@ const CheckInCountdown: React.FC<CheckInCountdownProps> = ({
 
   // Calculate time remaining in seconds
   const calculateTimeLeft = useCallback(() => {
-    const difference = Math.floor((scheduledTime.getTime() - Date.now()) / 1000);
+    // Fixed current time at 9:34 PM
+    const currentTime = new Date();
+    currentTime.setHours(21, 34, 0); // Set to 9:34 PM
+
+    const difference = Math.floor((scheduledTime.getTime() - currentTime.getTime()) / 1000);
     return difference > 0 ? difference : 0;
   }, [scheduledTime]);
 
@@ -40,16 +44,17 @@ const CheckInCountdown: React.FC<CheckInCountdownProps> = ({
     return () => clearInterval(timer);
   }, [calculateTimeLeft, isComplete, onComplete]);
 
-  // Format seconds into MM:SS
+  // Format seconds into HH:MM:SS
   const formatTime = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   // Calculate percentage for progress circle
   const calculatePercentage = (): number => {
-    const totalDuration = Math.floor((scheduledTime.getTime() - Date.now()) / 1000);
+    const totalDuration = Math.floor((scheduledTime.getTime() - new Date(new Date().setHours(21, 34, 0)).getTime()) / 1000);
     return (timeLeft / totalDuration) * 100;
   };
 
@@ -58,7 +63,7 @@ const CheckInCountdown: React.FC<CheckInCountdownProps> = ({
       <div className="wa-bg-dark rounded-xl w-5/6 p-5 max-w-xs text-center">
         <h2 className="text-xl font-bold mb-2">Check-In Scheduled</h2>
         <p className="mb-6 text-sm wa-text-secondary">
-          A safety check will be requested when the timer reaches 00:00
+          A safety check will be requested when the timer reaches 00:00:00
         </p>
         
         {/* Timer Circle */}
@@ -90,7 +95,7 @@ const CheckInCountdown: React.FC<CheckInCountdownProps> = ({
           
           {/* Timer Text */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-4xl font-bold">{formatTime(timeLeft)}</span>
+            <span className="text-3xl font-bold">{formatTime(timeLeft)}</span>
           </div>
         </div>
         
